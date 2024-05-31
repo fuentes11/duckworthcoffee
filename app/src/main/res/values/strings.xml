@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">duckworthcoffee</string>
     <string name="app_description">duckworthcoffee</string>
+    <string name="action_settings">Settings</string>
+    <string name="sample_device_admin">test</string>
+    <string name="sample_device_admin_description">Test</string>
+
 </resources>
