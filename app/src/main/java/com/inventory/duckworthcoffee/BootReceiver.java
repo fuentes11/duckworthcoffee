@@ -13,7 +13,7 @@ public class BootReceiver extends BroadcastReceiver {
         if (intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
             Log.e("BOOT_CHECK", "Receiver Arrive_2");
 
-            // Agregar un retraso antes de iniciar MainActivity
+            // Add a delay before starting MainActivity
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
@@ -22,7 +22,7 @@ public class BootReceiver extends BroadcastReceiver {
                     context.startActivity(i);
                     Log.e("BOOT_CHECK", "MainActivity started directly");
                 }
-            }, 5000); // Retraso de 5 segundos (puedes ajustar este valor según sea necesario)
+            }, 5000); // 5-second delay (you can adjust this value as needed)
         }
         Log.e("BOOT_CHECK", "Receiver Arrive_3");
     }
