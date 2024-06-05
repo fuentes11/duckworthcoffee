@@ -23,6 +23,9 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -33,8 +36,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
-    private static final String EXIT_PASSWORD = "1234";
-    private static final String ADMIN_PASSWORD = "admin123"; // Cambia esta contraseña según tus necesidades
+    private static final String ADMIN_PASSWORD = "DrinkCoffee12!@"; // Change this password as per your needs
     private WebView webView;
     private static final String DEFAULT_URL = "https://inventory.duckworthcoffee.com/login";
     final int flags = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         startLockTask();
         getWindow().getDecorView().setSystemUiVisibility(flags);
 
-        /* Following code allow the app packages to lock task in true kiosk mode */
+        /* Following code allows the app packages to lock task in true kiosk mode */
         setContentView(R.layout.activity_main);
         // get policy manager
         DevicePolicyManager myDevicePolicyManager = (DevicePolicyManager) getSystemService(Context.DEVICE_POLICY_SERVICE);
@@ -69,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(),"Not owner", Toast.LENGTH_LONG).show();
         }
 
-        setVolumMax();
+        setVolumeMax();
 
 
         webView = findViewById(R.id.webview);
@@ -83,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-                // Permitir la navegación a cualquier URL
+                // Allow navigation to any URL
                 return false;
             }
         });
@@ -124,39 +126,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int CHANGE_LINK_REQUEST = 1;
 
-    // Modificar el método para iniciar ChangeLinkActivity
-    private void showAdminPasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter Admin Password");
-
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String password = input.getText().toString();
-                if (password.equals(ADMIN_PASSWORD)) {
-                    Log.d(TAG, "Correct admin password entered. Redirecting to change link...");
-                    Intent intent = new Intent(MainActivity.this, ChangeLinkActivity.class);
-                    startActivityForResult(intent, CHANGE_LINK_REQUEST); // Iniciar actividad con identificador de solicitud
-                } else {
-                    Log.d(TAG, "Incorrect admin password entered.");
-                    Toast.makeText(MainActivity.this, "Incorrect admin password", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Log.d(TAG, "Admin password entry cancelled.");
-                dialog.cancel();
-            }
-        });
-
-        builder.show();
-    }
+    // Modify the method to start ChangeLinkActivity
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event){
 
@@ -173,20 +143,21 @@ public class MainActivity extends AppCompatActivity {
         return super.onKeyDown(keyCode, event);
     }
 
-    private void setVolumMax(){
+    private void setVolumeMax(){
         AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         am.setStreamVolume(
                 AudioManager.STREAM_SYSTEM,
                 am.getStreamMaxVolume(AudioManager.STREAM_SYSTEM),
                 0);
     }
-    // Método para manejar el resultado de ChangeLinkActivity
+
+    // Method to handle the result from ChangeLinkActivity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CHANGE_LINK_REQUEST) {
             if (resultCode == RESULT_OK && data != null) {
-                // Recuperar la nueva URL del Intent y cargarla en el WebView
+                // Retrieve the new URL from the Intent and load it into the WebView
                 String newUrl = data.getStringExtra("NEW_URL");
                 Log.d(TAG, "New URL received from ChangeLinkActivity: " + newUrl);
                 if (newUrl != null && !newUrl.isEmpty()) {
@@ -195,20 +166,134 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-    private void showExitPasswordDialog() {
+    private void showAdminPasswordDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Enter Password to Exit");
+        builder.setTitle("Enter Admin Password");
+
+        // Create a RelativeLayout to contain the EditText and the visibility button
+        RelativeLayout layout = new RelativeLayout(this);
 
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        builder.setView(input);
+        input.setId(View.generateViewId());
+
+        // Create the visibility button
+        final ImageButton visibilityButton = new ImageButton(this);
+        visibilityButton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+        visibilityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // On button click, toggle between password mode and normal text mode
+                if (input.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    visibilityButton.setImageResource(R.drawable.baseline_visibility_off_24);
+                } else {
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    visibilityButton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+                }
+                // Move the cursor to the end of the text
+                input.setSelection(input.length());
+            }
+        });
+
+        // Set position constraints for the EditText
+        RelativeLayout.LayoutParams inputParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        inputParams.addRule(RelativeLayout.ALIGN_PARENT_START);
+        layout.addView(input, inputParams);
+
+        // Set position constraints for the visibility button
+        RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        buttonParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+        buttonParams.addRule(RelativeLayout.ALIGN_BOTTOM, input.getId());
+        layout.addView(visibilityButton, buttonParams);
+
+        builder.setView(layout);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 String password = input.getText().toString();
-                if (password.equals(EXIT_PASSWORD)) {
+                if (password.equals(ADMIN_PASSWORD)) {
+                    Log.d(TAG, "Correct admin password entered. Redirecting to change link...");
+                    Intent intent = new Intent(MainActivity.this, ChangeLinkActivity.class);
+                    startActivityForResult(intent, CHANGE_LINK_REQUEST);
+                } else {
+                    Log.d(TAG, "Incorrect admin password entered.");
+                    Toast.makeText(MainActivity.this, "Incorrect admin password", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Log.d(TAG, "Cancelled.");
+                dialog.cancel();
+            }
+        });
+
+        builder.show();
+    }
+
+    private void showExitPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter Password to Exit");
+
+        // Create a RelativeLayout to contain the EditText and the visibility button
+        RelativeLayout layout = new RelativeLayout(this);
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setId(View.generateViewId());
+
+        // Create the visibility button
+        final ImageButton visibilityButton = new ImageButton(this);
+        visibilityButton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+        visibilityButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // On button click, toggle between password mode and normal text mode
+                if (input.getInputType() == (InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD)) {
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    visibilityButton.setImageResource(R.drawable.baseline_visibility_off_24);
+                } else {
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    visibilityButton.setImageResource(R.drawable.baseline_remove_red_eye_24);
+                }
+                // Move the cursor to the end of the text
+                input.setSelection(input.length());
+            }
+        });
+
+        // Set position constraints for the EditText
+        RelativeLayout.LayoutParams inputParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.MATCH_PARENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        inputParams.addRule(RelativeLayout.ALIGN_PARENT_START);
+        layout.addView(input, inputParams);
+
+        // Set position constraints for the visibility button
+        RelativeLayout.LayoutParams buttonParams = new RelativeLayout.LayoutParams(
+                RelativeLayout.LayoutParams.WRAP_CONTENT,
+                RelativeLayout.LayoutParams.WRAP_CONTENT
+        );
+        buttonParams.addRule(RelativeLayout.ALIGN_PARENT_END);
+        buttonParams.addRule(RelativeLayout.ALIGN_BOTTOM, input.getId());
+        layout.addView(visibilityButton, buttonParams);
+
+        builder.setView(layout);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String password = input.getText().toString();
+                if (password.equals(ADMIN_PASSWORD)) {
                     Log.d(TAG, "Correct password entered. Exiting...");
                     stopLockTask();
                     finish();
@@ -230,8 +315,9 @@ public class MainActivity extends AppCompatActivity {
         builder.show();
     }
 
+
     private void enterFullScreenMode() {
-        // Configurar la pantalla completa
+        // Configure full-screen
         View decorView = getWindow().getDecorView();
         decorView.setSystemUiVisibility(
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -254,6 +340,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        // Deshabilitar el botón de retroceso
+        // Disable back button
+        super.onBackPressed();
     }
 }

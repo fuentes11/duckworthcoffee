@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#fff6ed"
     android:padding="16dp">
 
     <EditText
@@ -10,12 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Enter new link"
+        android:textColor="@color/black"
         android:inputType="textUri" />
 
     <Button
         android:id="@+id/buttonSave"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="#59aaf5"
         android:text="Save" />
 
 </LinearLayout>

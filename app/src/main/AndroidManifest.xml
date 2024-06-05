@@ -18,6 +18,7 @@
         android:theme="@style/Theme.Duckworthcoffee">
         <activity
             android:name=".ChangeLinkActivity"
+            android:parentActivityName=".MainActivity"
             android:exported="false" />
         <activity
             android:name=".MainActivity"

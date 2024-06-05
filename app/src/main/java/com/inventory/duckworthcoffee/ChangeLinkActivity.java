@@ -23,7 +23,7 @@ public class ChangeLinkActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_change_link);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         editTextLink = findViewById(R.id.editTextLink);
         buttonSave = findViewById(R.id.buttonSave);
 
@@ -48,7 +48,7 @@ public class ChangeLinkActivity extends AppCompatActivity {
         editor.putString("LINK", link);
         editor.apply();
         Log.d(TAG, "Link saved: " + link);
-        // Devolver la nueva URL a MainActivity
+        // Return the new URL to MainActivity
         Intent resultIntent = new Intent();
         resultIntent.putExtra("NEW_URL", link);
         setResult(RESULT_OK, resultIntent);
